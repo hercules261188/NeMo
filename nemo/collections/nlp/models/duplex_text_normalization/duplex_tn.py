@@ -111,7 +111,7 @@ class DuplexTextNormalizationModel(nn.Module):
 
         # Metrics
         tn_error_ctx, itn_error_ctx = 0, 0
-        for direction in ['FORWARD']:  # constants.INST_DIRECTIONS:
+        for direction in constants.INST_DIRECTIONS:
             (
                 cur_dirs,
                 cur_inputs,
@@ -249,9 +249,6 @@ class DuplexTextNormalizationModel(nn.Module):
         )
         output_spans = self.decoder._infer(sents, nb_spans, span_starts, span_ends, inst_directions)
 
-        # if not do_basic_tokenization:
-        #     sents = [x.split() for x in sents]
-
         # Prepare final outputs
         final_outputs = []
         for ix, (sent, tags) in enumerate(zip(sents, tag_preds)):
@@ -269,11 +266,9 @@ class DuplexTextNormalizationModel(nn.Module):
                         span_idx += 1
                         while jx < len(sent) and tags[jx] == constants.I_PREFIX + constants.TRANSFORM_TAG:
                             jx += 1
-                    # if pre_tokenization == 'moses':
-                    #     cur_output_str = self.decoder.processor.detokenize(cur_words)
-                    # else:
-                    cur_output_str = ' '.join(cur_words)
-                    cur_output_str = ' '.join(basic_tokenize(cur_output_str, self.lang))
+                    cur_output_str = self.decoder.processor.detokenize(cur_words)
+                    # cur_output_str = ' '.join(cur_words)
+                    # cur_output_str = ' '.join(basic_tokenize(cur_output_str, self.lang))
                 final_outputs.append(cur_output_str)
             except:
                 logging.warning(f"Sent #{ix} is too long and will be skipped - {' '.join(sent)}")
