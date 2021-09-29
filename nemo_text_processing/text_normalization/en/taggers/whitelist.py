@@ -60,9 +60,9 @@ class WhiteListFst(GraphFst):
             graph = pynini.string_map(whitelist_lower + whitelist_cased)
             return graph
 
-        self.whitelist_graph = _get_whitelist_graph(input_case).optimize()
+        graph = _get_whitelist_graph(input_case)
         if not deterministic:
-            self.whitelist_graph |= _get_whitelist_graph("lower_cased") | _get_whitelist_non_deterministic_graph()
+            graph |= _get_whitelist_graph("lower_cased") | _get_whitelist_non_deterministic_graph()
 
-        self.graph = (convert_space(self.whitelist_graph)).optimize()
+        self.graph = (convert_space(graph)).optimize()
         self.fst = (pynutil.insert("name: \"") + self.graph + pynutil.insert("\"")).optimize()
